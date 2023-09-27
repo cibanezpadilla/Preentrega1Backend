@@ -1,10 +1,16 @@
 import { existsSync, promises } from "fs";
+import { manager } from "./prodManager.js";
 
 
 /* por parámetro al constructor le paso la ruta del archivo a utilizar */
 class CartManager {
     constructor(path) {
         this.path = path
+    }
+
+
+    async getCarts() {
+
     }
 
     async createCart() {
@@ -44,14 +50,13 @@ class CartManager {
                 
                 const cartProductsParseado= JSON.parse(cartProductsFile)
                 const selectedCart = cartProductsParseado.find(c=> c.id === cid)
-                return selectedCart.products
-                /* if (selectedCart){
-                    return selectedCart.products
-                } */
+                return selectedCart                
+            }else{
+                throw new Error ("the file does not exist")
             }
         }
         catch(error){
-
+            throw new Error(error.message);
         }
                     
     }
@@ -66,6 +71,11 @@ class CartManager {
             const selectedCart = cartProductsParseado.find(c=> c.id === cid)
 
             if (selectedCart){
+                const product = await manager.getProductById(pid);
+                if (!product) {
+                  throw new Error("There is no product with this id");
+                }
+
                 const prodExists = selectedCart.products.find(p=>p.pid === pid)
                 if (prodExists) {
                     const index = selectedCart.products.findIndex(p=> p.pid == pid)
